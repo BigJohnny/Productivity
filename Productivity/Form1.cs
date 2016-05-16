@@ -50,7 +50,13 @@ namespace Productivity
 
 
             string sTitle = textBox1.Text;
-            label2.Text = string.Format("項目:{0} 從 {1}:{2} 開始到現在,已做了{3}分{4}秒", sTitle, dStart.Hour,dStart.Minute,tsDuration.Minutes, tsDuration.Seconds);
+            string sFormat = string.Format("項目:{0} 從 {1}:{2} 開始到現在,已做了", sTitle, dStart.Hour, dStart.Minute);
+            if (tsDuration.Hours > 0)
+                sFormat += string.Format("{0}時",tsDuration.Hours);
+            if (tsDuration.Minutes > 0)
+                sFormat += string.Format("{0}分",tsDuration.Minutes);
+
+            label2.Text = sFormat + string.Format("{0}秒", tsDuration.Seconds);
 
             sw.Start();
         }
@@ -90,11 +96,20 @@ namespace Productivity
             sw.Stop();
             sw.Reset();
             timer1.Stop();
+
+            string sFormat = string.Format("{0},", sTitle);
+            if (tsDuration.Hours > 0)
+                sFormat += string.Format("{0}時", tsDuration.Hours);
+            if (tsDuration.Minutes > 0)
+                sFormat += string.Format("{0}分", tsDuration.Minutes);
             
-            checkedListBox1.Items.Insert(0,string.Format("{0},{1}分{2}秒", sTitle, tsDuration.Minutes, tsDuration.Seconds));
+            checkedListBox1.Items.Insert(0, sFormat + string.Format("{0}秒", tsDuration.Seconds));
             textBox1.Text = "";
-            
+
             //todo 存入當日檔案
+            
         }
     }
+
+
 }
