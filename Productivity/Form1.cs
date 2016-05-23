@@ -17,17 +17,24 @@ namespace Productivity
         DateTime dStart;
         TimeSpan tsDuration;
         string sTitle = "";
+        DataTable dtProductivity;
 
         public Form1()
         {
             InitializeComponent();
 
             //todo 載入當週工作項目
+            dtProductivity = new DataTable("Productivity");
+            dtProductivity.Columns.Add("項目名稱", typeof(string));
+            dtProductivity.Columns.Add("執行時間", typeof(string));
+            dtProductivity.Columns.Add("duration", typeof(TimeSpan));
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            
+            dataGridView1.DataSource = dtProductivity;
+            dataGridView1.Columns["duration"].Visible = false;
+            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -97,18 +104,50 @@ namespace Productivity
             sw.Reset();
             timer1.Stop();
 
-            string sFormat = string.Format("{0},", sTitle);
+            string sFormat = "";
             if (tsDuration.Hours > 0)
                 sFormat += string.Format("{0}時", tsDuration.Hours);
             if (tsDuration.Minutes > 0)
                 sFormat += string.Format("{0}分", tsDuration.Minutes);
+
+            DataRow drTemp = dtProductivity.NewRow();
+            drTemp[0] = sTitle;
+            drTemp[1] = sFormat + string.Format("{0}秒", tsDuration.Seconds);
+            drTemp[2] = tsDuration;
+            dtProductivity.Rows.InsertAt(drTemp,0);
             
-            checkedListBox1.Items.Insert(0, sFormat + string.Format("{0}秒", tsDuration.Seconds));
             textBox1.Text = "";
 
             //todo 存入當日檔案
             
         }
+
+        /// <summary>
+        /// 繼續執行選擇項目
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedCells.Count == 0)
+            {
+                MessageBox.Show("請選擇一筆項目");
+                return;
+            }
+            if (sw.Elapsed.TotalSeconds >0)
+            {
+                MessageBox.Show("項目正在執行中,請終止執行中項目");
+                return;
+            }
+
+            sTitle = dataGridView1.SelectedRows[0].Cells[0].Value.ToString();
+            textBox1.Text = sTitle;
+            dStart = DateTime.Now;            
+            timer1.Start();
+            sw.Start();
+
+        }
+
     }
 
 
